@@ -3,17 +3,39 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $article->title }} - Haven</title>
+    <meta name="description" content="{{ theme()->description() }}">
+    <title>{{ $article->title }} - {{ theme()->name() }}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ theme()->favicon() }}">
+
+    <!-- Theme Styles -->
+    <x-theme-styles />
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @if(theme('analytics.google_analytics'))
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ theme('analytics.google_analytics') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ theme('analytics.google_analytics') }}');
+    </script>
+    @endif
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 flex flex-col">
         <nav class="bg-white border-b border-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex">
                         <div class="shrink-0 flex items-center">
-                            <a href="{{ route('home') }}" class="text-xl font-bold">Haven</a>
+                            <a href="{{ route('home') }}" class="text-xl font-bold">{{ theme()->name() }}</a>
+                            @if(theme()->tagline())
+                                <span class="ml-2 text-sm text-gray-500">{{ theme()->tagline() }}</span>
+                            @endif
                         </div>
                     </div>
                     <div class="flex items-center">
@@ -28,11 +50,12 @@
             </div>
         </nav>
 
-        <div class="py-12">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                <div class="mb-4">
-                    <a href="{{ route('articles.index') }}" class="text-blue-600 hover:text-blue-800">&larr; Back to Articles</a>
-                </div>
+        <main class="flex-grow">
+            <div class="py-12">
+                <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                    <div class="mb-4">
+                        <a href="{{ route('articles.index') }}" class="text-blue-600 hover:text-blue-800">&larr; Back to Articles</a>
+                    </div>
 
                 <article class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-8">
@@ -47,8 +70,11 @@
                         </div>
                     </div>
                 </article>
+                </div>
             </div>
-        </div>
+        </main>
+
+        <x-public-footer />
     </div>
 </body>
 </html>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,6 +10,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ArticleController::class, 'index'])->name('home');
 Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+
+// Legal pages
+Route::get('/privacy', [PageController::class, 'privacy'])->name('page.privacy');
+Route::get('/terms', [PageController::class, 'terms'])->name('page.terms');
+Route::get('/dmca', [PageController::class, 'dmca'])->name('page.dmca');
+Route::get('/disclaimer', [PageController::class, 'disclaimer'])->name('page.disclaimer');
+Route::get('/contact', [PageController::class, 'contact'])->name('page.contact');
 
 // Authenticated routes
 Route::get('/dashboard', function () {
