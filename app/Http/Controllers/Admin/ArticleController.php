@@ -9,11 +9,6 @@ use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index()
     {
         $articles = Article::with('user')->latest()->paginate(15);

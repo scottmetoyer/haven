@@ -45,6 +45,10 @@
                                     </h2>
                                     @if($article->excerpt)
                                         <p class="text-gray-600 mb-4">{{ $article->excerpt }}</p>
+                                    @else
+                                        <div class="text-gray-700 mb-4 prose max-w-none">
+                                            {!! Str::limit($article->content, 300) !!}
+                                        </div>
                                     @endif
                                     <div class="text-sm text-gray-500">
                                         Published {{ $article->published_at->diffForHumans() }}
