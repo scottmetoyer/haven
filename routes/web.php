@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
+use App\Http\Controllers\Admin\AffiliateSiteController;
+use App\Http\Controllers\Admin\ReviewGenerationSettingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +34,10 @@ Route::middleware('auth')->group(function () {
 // Admin routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('articles', AdminArticleController::class);
+    Route::resource('affiliate-sites', AffiliateSiteController::class);
+
+    Route::get('review-settings', [ReviewGenerationSettingController::class, 'index'])->name('review-settings.index');
+    Route::post('review-settings', [ReviewGenerationSettingController::class, 'update'])->name('review-settings.update');
 });
 
 require __DIR__.'/auth.php';

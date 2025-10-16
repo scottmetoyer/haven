@@ -18,16 +18,24 @@ class Article extends Model
         'excerpt',
         'published',
         'published_at',
+        'is_ai_generated',
+        'scraped_content_id',
     ];
 
     protected $casts = [
         'published' => 'boolean',
         'published_at' => 'datetime',
+        'is_ai_generated' => 'boolean',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scrapedContent(): BelongsTo
+    {
+        return $this->belongsTo(ScrapedContent::class);
     }
 
     protected static function boot()
