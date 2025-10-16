@@ -46,6 +46,17 @@
                             <p class="font-normal text-gray-700 dark:text-gray-300 text-center text-sm">Manage affiliate sites to scrape</p>
                         </a>
 
+                        <!-- Scraped Content -->
+                        <a href="{{ route('admin.scraped-content.index') }}" class="block p-6 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                            <div class="flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                            </div>
+                            <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 text-center">Scraped Content</h5>
+                            <p class="font-normal text-gray-700 dark:text-gray-300 text-center text-sm">Review and manage scraped articles</p>
+                        </a>
+
                         <!-- Review Settings -->
                         <a href="{{ route('admin.review-settings.index') }}" class="block p-6 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow hover:bg-gray-100 dark:hover:bg-gray-600 transition">
                             <div class="flex items-center justify-center mb-4">

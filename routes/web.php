@@ -38,6 +38,14 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('review-settings', [ReviewGenerationSettingController::class, 'index'])->name('review-settings.index');
     Route::post('review-settings', [ReviewGenerationSettingController::class, 'update'])->name('review-settings.update');
+
+    Route::get('scraped-content', function () {
+        return view('admin.scraped-content.review');
+    })->name('scraped-content.index');
+
+    Route::get('scraped-content/review', function () {
+        return view('admin.scraped-content.review');
+    })->name('scraped-content.review');
 });
 
 require __DIR__.'/auth.php';
