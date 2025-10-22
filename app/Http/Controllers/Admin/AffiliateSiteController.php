@@ -213,6 +213,23 @@ class AffiliateSiteController extends Controller
     }
 
     /**
+     * Manually trigger scraping for a specific site.
+     */
+    public function scrape(AffiliateSite $affiliateSite)
+    {
+        $scraper = app(\App\Services\AffiliateScraper::class);
+        $result = $scraper->scrape($affiliateSite);
+
+        if ($result['success']) {
+            return redirect()->route('admin.affiliate-sites.index')
+                ->with('success', $result['message']);
+        } else {
+            return redirect()->route('admin.affiliate-sites.index')
+                ->with('error', $result['message']);
+        }
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(AffiliateSite $affiliateSite)

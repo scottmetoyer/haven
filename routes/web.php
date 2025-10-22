@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('articles', AdminArticleController::class);
     Route::resource('affiliate-sites', AffiliateSiteController::class);
+    Route::post('affiliate-sites/{affiliate_site}/scrape', [AffiliateSiteController::class, 'scrape'])->name('affiliate-sites.scrape');
 
     Route::get('review-settings', [ReviewGenerationSettingController::class, 'index'])->name('review-settings.index');
     Route::post('review-settings', [ReviewGenerationSettingController::class, 'update'])->name('review-settings.update');

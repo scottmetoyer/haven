@@ -23,6 +23,12 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     @if($affiliateSites->count() > 0)
@@ -62,6 +68,10 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('admin.affiliate-sites.show', $site) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">View</a>
                                             <a href="{{ route('admin.affiliate-sites.edit', $site) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">Edit</a>
+                                            <form action="{{ route('admin.affiliate-sites.scrape', $site) }}" method="POST" class="inline mr-3">
+                                                @csrf
+                                                <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" onclick="return confirm('Scrape this site now?')">Scrape Now</button>
+                                            </form>
                                             <form action="{{ route('admin.affiliate-sites.destroy', $site) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
