@@ -15,6 +15,24 @@ class ScrapedContentReview extends Component
     public $selectedContent = [];
     public $showModal = false;
     public $aiPrompt = '';
+    public $search = '';
+    public $sortField = 'discovered_at';
+    public $sortDirection = 'desc';
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
 
     public function toggleSelection($contentId)
     {
@@ -73,9 +91,32 @@ class ScrapedContentReview extends Component
 
     public function render()
     {
-        $scrapedContents = ScrapedContent::with('affiliateSite')
-            ->orderBy('discovered_at', 'desc')
-            ->paginate(20);
+        // Show all scraped content with search and sorting
+        // Items with no articles will show a "NEW" pill
+        $query = ScrapedContent::with(['affiliateSite', 'articles']);
+
+        // Apply search filter
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%' . $this->search . '%')
+                    ->orWhere('content_url', 'like', '%' . $this->search . '%')
+                    ->orWhere('content_identifier', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('affiliateSite', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    });
+            });
+        }
+
+        // Apply sorting
+        if ($this->sortField === 'source') {
+            $query->join('affiliate_sites', 'scraped_contents.affiliate_site_id', '=', 'affiliate_sites.id')
+                ->select('scraped_contents.*')
+                ->orderBy('affiliate_sites.name', $this->sortDirection);
+        } else {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        }
+
+        $scrapedContents = $query->paginate(20);
 
         $selectedScrapedContents = ScrapedContent::with('affiliateSite')
             ->whereIn('id', $this->selectedContent)

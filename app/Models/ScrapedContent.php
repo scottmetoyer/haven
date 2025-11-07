@@ -19,7 +19,6 @@ class ScrapedContent extends Model
         'processed_at',
         'status',
         'error_message',
-        'article_id',
     ];
 
     protected $casts = [
@@ -32,8 +31,8 @@ class ScrapedContent extends Model
         return $this->belongsTo(AffiliateSite::class);
     }
 
-    public function article(): BelongsTo
+    public function articles()
     {
-        return $this->belongsTo(Article::class);
+        return $this->belongsToMany(Article::class, 'article_scraped_content');
     }
 }

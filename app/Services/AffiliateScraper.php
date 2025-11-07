@@ -200,14 +200,33 @@ class AffiliateScraper
             $titleNode = $xpath->query($config['title_expression'], $itemNode)->item(0);
             $urlNode = $xpath->query($config['url_expression'], $itemNode)->item(0);
 
-            $title = $titleNode ? trim($titleNode->textContent) : null;
-            $url = $urlNode ? ($urlNode->getAttribute('href') ?: trim($urlNode->textContent)) : null;
+            $title = $titleNode ? trim($titleNode->nodeValue) : null;
+
+            // Handle both attribute nodes (e.g., @href) and element nodes
+            $url = null;
+            if ($urlNode) {
+                if ($urlNode instanceof \DOMAttr) {
+                    $url = $urlNode->nodeValue;
+                } elseif ($urlNode instanceof \DOMElement) {
+                    $url = $urlNode->getAttribute('href') ?: trim($urlNode->textContent);
+                } else {
+                    $url = trim($urlNode->nodeValue);
+                }
+            }
 
             if ($title && $url) {
                 $date = null;
                 if (!empty($config['date_expression'])) {
                     $dateNode = $xpath->query($config['date_expression'], $itemNode)->item(0);
-                    $date = $dateNode ? $this->parseDate($dateNode->getAttribute('datetime') ?: trim($dateNode->textContent)) : null;
+                    if ($dateNode) {
+                        if ($dateNode instanceof \DOMAttr) {
+                            $date = $this->parseDate($dateNode->nodeValue);
+                        } elseif ($dateNode instanceof \DOMElement) {
+                            $date = $this->parseDate($dateNode->getAttribute('datetime') ?: trim($dateNode->textContent));
+                        } else {
+                            $date = $this->parseDate(trim($dateNode->nodeValue));
+                        }
+                    }
                 }
 
                 $items[] = [

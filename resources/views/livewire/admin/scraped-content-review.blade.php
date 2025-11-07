@@ -1,5 +1,5 @@
 <div>
-    <div class="py-4">
+    <div class="mb-4">
         <div class="flex justify-between items-center mb-4">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Scraped Content Review</h3>
@@ -19,88 +19,133 @@
             </div>
         </div>
 
-        @if (session()->has('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
+        <!-- Search Bar -->
+        <div class="mb-4">
+            <input
+                type="text"
+                wire:model.live="search"
+                placeholder="Search by title, URL, ID, or source..."
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+            >
+        </div>
+    </div>
 
-        @if (session()->has('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {{ session('error') }}
-            </div>
-        @endif
+    @if (session()->has('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
 
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
-                                <input type="checkbox" class="rounded">
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Discovered</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">URL</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($scrapedContents as $content)
-                            <tr class="{{ in_array($content->id, $selectedContent) ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <input
-                                        type="checkbox"
-                                        wire:click="toggleSelection({{ $content->id }})"
-                                        {{ in_array($content->id, $selectedContent) ? 'checked' : '' }}
-                                        class="rounded"
-                                    >
-                                </td>
-                                <td class="px-6 py-4">
+    @if (session()->has('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
+                            <input type="checkbox" class="rounded">
+                        </th>
+                        <th wire:click="sortBy('title')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+                            <div class="flex items-center gap-1">
+                                Title
+                                @if($sortField === 'title')
+                                    <span class="text-blue-600 dark:text-blue-400">
+                                        @if($sortDirection === 'asc')
+                                            ↑
+                                        @else
+                                            ↓
+                                        @endif
+                                    </span>
+                                @endif
+                            </div>
+                        </th>
+                        <th wire:click="sortBy('source')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+                            <div class="flex items-center gap-1">
+                                Source
+                                @if($sortField === 'source')
+                                    <span class="text-blue-600 dark:text-blue-400">
+                                        @if($sortDirection === 'asc')
+                                            ↑
+                                        @else
+                                            ↓
+                                        @endif
+                                    </span>
+                                @endif
+                            </div>
+                        </th>
+                        <th wire:click="sortBy('discovered_at')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+                            <div class="flex items-center gap-1">
+                                Discovered
+                                @if($sortField === 'discovered_at')
+                                    <span class="text-blue-600 dark:text-blue-400">
+                                        @if($sortDirection === 'asc')
+                                            ↑
+                                        @else
+                                            ↓
+                                        @endif
+                                    </span>
+                                @endif
+                            </div>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">URL</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse($scrapedContents as $content)
+                        <tr class="{{ in_array($content->id, $selectedContent) ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input
+                                    type="checkbox"
+                                    wire:click="toggleSelection({{ $content->id }})"
+                                    {{ in_array($content->id, $selectedContent) ? 'checked' : '' }}
+                                    class="rounded"
+                                >
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                         {{ $content->title ?? 'No title' }}
                                     </div>
-                                    @if($content->content_identifier)
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ $content->content_identifier }}</div>
+                                    @if($content->articles->isEmpty())
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                            NEW
+                                        </span>
                                     @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900 dark:text-gray-100">{{ $content->affiliateSite->name ?? 'N/A' }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        {{ $content->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
-                                        {{ $content->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                        {{ $content->status === 'processing' ? 'bg-blue-100 text-blue-800' : '' }}
-                                        {{ $content->status === 'failed' ? 'bg-red-100 text-red-800' : '' }}
-                                    ">
-                                        {{ ucfirst($content->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $content->discovered_at->format('M j, Y') }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <a href="{{ $content->content_url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm truncate block max-w-xs">
-                                        {{ Str::limit($content->content_url, 50) }}
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                    No scraped content available.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                                @if($content->content_identifier)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ $content->content_identifier }}</div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-gray-100">{{ $content->affiliateSite->name ?? 'N/A' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ $content->discovered_at->format('M j, Y') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="{{ $content->content_url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm truncate block max-w-xs">
+                                    {{ Str::limit($content->content_url, 50) }}
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                No scraped content available.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-            <div class="px-6 py-4 border-t">
-                {{ $scrapedContents->links() }}
-            </div>
+        <div class="px-6 py-4 border-t">
+            {{ $scrapedContents->links() }}
         </div>
     </div>
 

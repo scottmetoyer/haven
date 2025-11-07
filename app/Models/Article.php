@@ -19,7 +19,6 @@ class Article extends Model
         'published',
         'published_at',
         'is_ai_generated',
-        'scraped_content_id',
     ];
 
     protected $casts = [
@@ -33,9 +32,9 @@ class Article extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scrapedContent(): BelongsTo
+    public function scrapedContents()
     {
-        return $this->belongsTo(ScrapedContent::class);
+        return $this->belongsToMany(ScrapedContent::class, 'article_scraped_content');
     }
 
     protected static function boot()

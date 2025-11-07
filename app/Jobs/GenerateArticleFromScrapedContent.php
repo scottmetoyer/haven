@@ -66,12 +66,14 @@ class GenerateArticleFromScrapedContent implements ShouldQueue
                 'is_ai_generated' => true,
             ]);
 
+            // Attach scraped contents to article via pivot table
+            $article->scrapedContents()->attach($this->scrapedContentIds);
+
             // Mark scraped contents as completed
             foreach ($scrapedContents as $content) {
                 $content->update([
                     'status' => 'completed',
                     'processed_at' => now(),
-                    'article_id' => $article->id,
                 ]);
             }
 

@@ -89,7 +89,6 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">URL</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Discovered</th>
                                 </tr>
                             </thead>
@@ -97,7 +96,19 @@
                                 @foreach($affiliateSite->scrapedContents->take(20) as $content)
                                     <tr>
                                         <td class="px-6 py-4">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $content->title ?? 'No title' }}</div>
+                                            <div class="flex items-center gap-2">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    {{ $content->title ?? 'No title' }}
+                                                </div>
+                                                @if($content->articles->isEmpty())
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                                        NEW
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            @if($content->content_identifier)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ $content->content_identifier }}</div>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -105,15 +116,6 @@
                                                     {{ Str::limit($content->content_url, 50) }}
                                                 </a>
                                             </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                                {{ $content->status === 'completed' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : '' }}
-                                                {{ $content->status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' : '' }}
-                                                {{ $content->status === 'processing' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : '' }}
-                                                {{ $content->status === 'failed' ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' : '' }}">
-                                                {{ ucfirst($content->status) }}
-                                            </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                             {{ $content->discovered_at?->format('M j, Y H:i') }}
