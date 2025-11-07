@@ -37,9 +37,20 @@ class ScrapedContentReview extends Component
     public function toggleSelection($contentId)
     {
         if (in_array($contentId, $this->selectedContent)) {
-            $this->selectedContent = array_diff($this->selectedContent, [$contentId]);
+            $this->selectedContent = array_values(array_diff($this->selectedContent, [$contentId]));
         } else {
             $this->selectedContent[] = $contentId;
+        }
+    }
+
+    public function toggleSelectAll($visibleIds)
+    {
+        $allSelected = !empty($visibleIds) && count(array_intersect($visibleIds, $this->selectedContent)) === count($visibleIds);
+
+        if ($allSelected) {
+            $this->selectedContent = array_values(array_diff($this->selectedContent, $visibleIds));
+        } else {
+            $this->selectedContent = array_unique(array_merge($this->selectedContent, $visibleIds));
         }
     }
 
@@ -71,7 +82,6 @@ class ScrapedContentReview extends Component
         }
 
         try {
-            // Dispatch the job to the queue
             GenerateArticleFromScrapedContent::dispatch(
                 $this->selectedContent,
                 $this->aiPrompt,
@@ -91,8 +101,6 @@ class ScrapedContentReview extends Component
 
     public function render()
     {
-        // Show all scraped content with search and sorting
-        // Items with no articles will show a "NEW" pill
         $query = ScrapedContent::with(['affiliateSite', 'articles']);
 
         // Apply search filter
@@ -107,7 +115,6 @@ class ScrapedContentReview extends Component
             });
         }
 
-        // Apply sorting
         if ($this->sortField === 'source') {
             $query->join('affiliate_sites', 'scraped_contents.affiliate_site_id', '=', 'affiliate_sites.id')
                 ->select('scraped_contents.*')

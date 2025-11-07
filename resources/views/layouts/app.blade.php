@@ -20,6 +20,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
 
         @if(theme('analytics.google_analytics'))
         <!-- Google Analytics -->
@@ -122,5 +123,7 @@
                 }
             });
         </script>
+
+        @livewireScripts
     </body>
 </html>

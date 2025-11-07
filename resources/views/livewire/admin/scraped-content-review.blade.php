@@ -48,7 +48,16 @@
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
-                            <input type="checkbox" class="rounded">
+                            @php
+                                $visibleIds = $scrapedContents->pluck('id')->toArray();
+                                $allVisibleSelected = !empty($visibleIds) && count(array_intersect($visibleIds, $selectedContent)) === count($visibleIds);
+                            @endphp
+                            <input
+                                type="checkbox"
+                                class="rounded cursor-pointer"
+                                wire:click="toggleSelectAll({{ json_encode($visibleIds) }})"
+                                {{ $allVisibleSelected ? 'checked' : '' }}
+                            >
                         </th>
                         <th wire:click="sortBy('title')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
                             <div class="flex items-center gap-1">
@@ -97,13 +106,13 @@
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($scrapedContents as $content)
-                        <tr class="{{ in_array($content->id, $selectedContent) ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
+                        <tr wire:key="content-{{ $content->id }}" class="{{ in_array($content->id, $selectedContent) ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input
                                     type="checkbox"
                                     wire:click="toggleSelection({{ $content->id }})"
                                     {{ in_array($content->id, $selectedContent) ? 'checked' : '' }}
-                                    class="rounded"
+                                    class="rounded cursor-pointer"
                                 >
                             </td>
                             <td class="px-6 py-4">
