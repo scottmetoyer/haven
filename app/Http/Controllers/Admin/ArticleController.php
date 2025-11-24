@@ -27,13 +27,14 @@ class ArticleController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable',
             'published' => 'boolean',
+            'published_at' => 'nullable|date',
         ]);
 
         $validated['user_id'] = auth()->id();
         $validated['slug'] = Str::slug($validated['title']);
 
         if ($request->has('published') && $request->published) {
-            $validated['published_at'] = now();
+            $validated['published_at'] = $request->published_at ?? now();
         }
 
         Article::create($validated);
@@ -59,12 +60,14 @@ class ArticleController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable',
             'published' => 'boolean',
+            'published_at' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
 
-        if ($request->has('published') && $request->published && !$article->published) {
-            $validated['published_at'] = now();
+        if ($request->has('published') && $request->published) {
+            // Use provided published_at, or existing one, or now()
+            $validated['published_at'] = $request->published_at ?? $article->published_at ?? now();
         } elseif (!$request->has('published') || !$request->published) {
             $validated['published_at'] = null;
         }

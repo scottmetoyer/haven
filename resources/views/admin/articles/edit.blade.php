@@ -48,6 +48,17 @@
                             </label>
                         </div>
 
+                        <div class="mb-4">
+                            <label for="published_at" class="block text-gray-700 text-sm font-bold mb-2">Publish Date (Optional)</label>
+                            <input type="datetime-local" name="published_at" id="published_at"
+                                   value="{{ old('published_at', $article->published_at ? $article->published_at->format('Y-m-d\TH:i') : '') }}"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('published_at') border-red-500 @enderror">
+                            <p class="text-gray-600 text-xs mt-1">Leave empty to use current date/time when published</p>
+                            @error('published_at')
+                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <div class="flex items-center justify-between">
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Update Article
