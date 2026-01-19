@@ -44,8 +44,8 @@
                             Published {{ $article->published_at->format('F j, Y') }}
                         </div>
 
-                        <div class="prose max-w-none">
-                            {!! nl2br(e($article->content)) !!}
+                        <div class="prose prose-lg max-w-none">
+                            {!! Str::markdown($article->content) !!}
                         </div>
                     </div>
                 </article>

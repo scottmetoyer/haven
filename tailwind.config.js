@@ -1,5 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -11,6 +12,16 @@ export default {
 
     darkMode: 'media',
 
+    safelist: [
+        'prose',
+        'prose-lg',
+        'prose-xl',
+        'max-w-none',
+        {
+            pattern: /prose-(headings|lead|h1|h2|h3|h4|p|a|blockquote|figure|figcaption|strong|em|code|pre|ol|ul|li|table|thead|tr|th|td|img|video|hr)/,
+        },
+    ],
+
     theme: {
         extend: {
             fontFamily: {
@@ -19,5 +30,5 @@ export default {
         },
     },
 
-    plugins: [forms],
+    plugins: [forms, typography],
 };
