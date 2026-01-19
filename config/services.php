@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'runpod' => [
+        'endpoint' => env('RUNPOD_API_ENDPOINT'),
+        'key' => env('RUNPOD_API_KEY'),
+    ],
+
 ];
