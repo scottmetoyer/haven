@@ -153,18 +153,43 @@ class GenerateArticleFromScrapedContent implements ShouldQueue
             ],
         ]);
 
+        // Debug: Log raw response
+        Log::debug('RunPod API response', [
+            'status_code' => $response->status(),
+            'body' => $response->body(),
+        ]);
+
         if (!$response->successful()) {
             throw new \Exception('Runpod API request failed: ' . $response->body());
         }
 
         $data = $response->json();
 
+        // Debug: Log parsed JSON structure
+        Log::debug('RunPod API parsed response', [
+            'keys' => array_keys($data ?? []),
+            'full_data' => $data,
+        ]);
+
         if (isset($data['error'])) {
             throw new \Exception('Runpod API error: ' . $data['error']);
         }
 
         $output = $data['output'] ?? [];
+
+        // RunPod returns output as an array: output[0] contains the choices
+        if (isset($output[0])) {
+            $output = $output[0];
+        }
+
         $choices = $output['choices'] ?? [];
+
+        // Debug: Log output structure
+        Log::debug('RunPod output extraction', [
+            'output_keys' => is_array($output) ? array_keys($output) : 'not_array',
+            'output_type' => gettype($output),
+            'choices_count' => is_array($choices) ? count($choices) : 'not_array',
+        ]);
 
         if (empty($choices)) {
             throw new \Exception('No content generated from AI service');
