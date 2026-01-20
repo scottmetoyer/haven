@@ -119,33 +119,83 @@ class GenerateArticleFromScrapedContent implements ShouldQueue
     }
 
     /**
-     * Call AI service - placeholder for Runpod integration
-     * TODO: Replace with actual Runpod API integration
+     * Call Runpod vLLM serverless endpoint (OpenAI-compatible)
      */
     protected function callAIService(string $context, string $prompt): string
     {
-        // Placeholder implementation
-        // Replace this with your Runpod API call
+        $endpointId = config('services.runpod.endpoint');
+        $apiKey = config('services.runpod.key');
 
-        $apiEndpoint = config('services.runpod.endpoint');
-
-        if (empty($apiEndpoint)) {
-            // Fallback to mock response for development
+        if (empty($endpointId) || empty($apiKey)) {
             return $this->generateMockArticle($context, $prompt);
         }
 
-        // TODO: Implement actual Runpod API call
-        $response = Http::timeout(120)->post($apiEndpoint, [
-            'context' => $context,
-            'prompt' => $prompt,
-            // Add other parameters as needed for your Runpod setup
+        $systemPrompt = "You are an expert content writer. Write engaging, SEO-optimized articles based on the provided source material. " .
+            "Format your response in markdown with a clear title (using # heading), introduction, body sections, and conclusion. " .
+            "Include relevant keywords naturally throughout the content.";
+
+        $userMessage = "Using the following source material as reference, {$prompt}\n\n{$context}";
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$apiKey}",
+            'Content-Type' => 'application/json',
+        ])->timeout(180)->post("https://api.runpod.ai/v2/{$endpointId}/runsync", [
+            'input' => [
+                'openai_route' => '/v1/chat/completions',
+                'openai_input' => [
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => $userMessage],
+                    ],
+                    'max_tokens' => 4096,
+                    'temperature' => 0.7,
+                ],
+            ],
+        ]);
+
+        // Debug: Log raw response
+        Log::debug('RunPod API response', [
+            'status_code' => $response->status(),
+            'body' => $response->body(),
         ]);
 
         if (!$response->successful()) {
-            throw new \Exception('AI API request failed: ' . $response->body());
+            throw new \Exception('Runpod API request failed: ' . $response->body());
         }
 
-        return $response->json()['generated_text'] ?? '';
+        $data = $response->json();
+
+        // Debug: Log parsed JSON structure
+        Log::debug('RunPod API parsed response', [
+            'keys' => array_keys($data ?? []),
+            'full_data' => $data,
+        ]);
+
+        if (isset($data['error'])) {
+            throw new \Exception('Runpod API error: ' . $data['error']);
+        }
+
+        $output = $data['output'] ?? [];
+
+        // RunPod returns output as an array: output[0] contains the choices
+        if (isset($output[0])) {
+            $output = $output[0];
+        }
+
+        $choices = $output['choices'] ?? [];
+
+        // Debug: Log output structure
+        Log::debug('RunPod output extraction', [
+            'output_keys' => is_array($output) ? array_keys($output) : 'not_array',
+            'output_type' => gettype($output),
+            'choices_count' => is_array($choices) ? count($choices) : 'not_array',
+        ]);
+
+        if (empty($choices)) {
+            throw new \Exception('No content generated from AI service');
+        }
+
+        return $choices[0]['message']['content'] ?? '';
     }
 
     /**
